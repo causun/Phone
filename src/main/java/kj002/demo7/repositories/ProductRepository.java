@@ -1,5 +1,6 @@
 package kj002.demo7.repositories;
 
+import kj002.demo7.models.DiscountCode;
 import kj002.demo7.models.Product;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,4 +30,7 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     // Sắp xếp theo giá giảm dần
     @Query("SELECT p FROM Product p ORDER BY p.price DESC")
     List<Product> findAllOrderByPriceDesc();
+
+    List<Product> findByDiscountCode(DiscountCode discountCode);
+
 }

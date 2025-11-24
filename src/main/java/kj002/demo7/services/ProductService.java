@@ -2,11 +2,11 @@ package kj002.demo7.services;
 
 import kj002.demo7.dtos.ProductDTO;
 import kj002.demo7.dtos.ProductUpdateDTO;
+import kj002.demo7.models.DiscountCode;
 import kj002.demo7.models.Product;
 import kj002.demo7.models.ProductImage;
 import kj002.demo7.repositories.ProductImageRepository;
 import kj002.demo7.repositories.ProductRepository;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,27 +14,53 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
 
+    private final DiscountService discountService;
     private ProductRepository productRepository;
     private ProductImageRepository productImageRepository;
 
     public ProductService(ProductRepository productRepository,
-                          ProductImageRepository productImageRepository) {
+                          ProductImageRepository productImageRepository, DiscountService discountService) {
         this.productRepository = productRepository;
         this.productImageRepository = productImageRepository;
+        this.discountService = discountService;
     }
+    public List<Product> findAllWithFinalPrice() {
+
+        List<Product> products = productRepository.findAll();
+
+        for (Product p : products) {
+
+            // nếu sản phẩm có mã giảm giá
+            if (p.getDiscountCode() != null) {
+
+                DiscountCode dc = p.getDiscountCode();
+
+                // kiểm tra mã giảm giá còn hiệu lực
+                DiscountCode valid = discountService.validateDiscount(dc);
+
+                if (valid != null) {
+                    double discountValue = p.getPrice() * (valid.getDiscountPercent() / 100);
+                    p.setFinalPrice(p.getPrice() - discountValue);
+                } else {
+                    p.setFinalPrice(p.getPrice());
+                }
+
+            } else {
+                p.setFinalPrice(p.getPrice());
+            }
+        }
+
+        return products;
+    }
+
 
     private String productImagesFolder = "productImages";
-
-    public List<Product> findAll() {
-        return productRepository.findAll();
-    }
-
     public Optional<Product> findById(Long id) {
+
         return productRepository.findById(id);
     }
 
@@ -52,13 +78,14 @@ public class ProductService {
         product.setCamera(productDTO.getCamera());
         product.setBattery(productDTO.getBattery());
         product.setOs(productDTO.getOs());
+        product.setPrice(productDTO.getPrice());
         product.setColor(productDTO.getColor());
         product.setDescription(productDTO.getDescription());
 
-        // ---  Lưu sản phẩm vào DB trước để có product_id ---
+        //Lưu sản phẩm vào DB trước để có product_id
         Product productCreated = productRepository.save(product);
 
-        // ---  Xử lý danh sách ảnh upload ---
+        //Xử lý danh sách ảnh upload
         List<ProductImage> productImagesList = new ArrayList<>();
 
         int index = 0;
@@ -108,6 +135,7 @@ public class ProductService {
         productExisting.setChipset(productUpdateDTO.getChipset());
         productExisting.setCamera(productUpdateDTO.getCamera());
         productExisting.setBattery(productUpdateDTO.getBattery());
+        productExisting.setQuantityInStock(productUpdateDTO.getQuantityInStock());
         productExisting.setOs(productUpdateDTO.getOs());
         productExisting.setColor(productUpdateDTO.getColor());
         productExisting.setDescription(productUpdateDTO.getDescription());
@@ -187,26 +215,34 @@ public class ProductService {
     public List<Product> searchByName(String keyword) {
         return productRepository.findByNameContainingIgnoreCase(keyword);
     }
+    private void applyFinalPrice(Product p) {
 
-    public List<Product> sortByPrice(String direction) {
-        if ("asc".equalsIgnoreCase(direction)) {
-            return productRepository.findAllOrderByPriceAsc();
-        } else if ("desc".equalsIgnoreCase(direction)) {
-            return productRepository.findAllOrderByPriceDesc();
+        if (p.getDiscountCode() == null) {
+            p.setFinalPrice(null);  // không có discount -> finalPrice = null
+            return;
+        }
+
+        DiscountCode valid = discountService.validateDiscount(p.getDiscountCode());
+
+        if (valid != null) {
+            double discountValue = p.getPrice() * (valid.getDiscountPercent() / 100);
+            p.setFinalPrice(p.getPrice() - discountValue);
         } else {
-            // nếu direction không hợp lệ → trả toàn bộ sản phẩm mặc định
-            return productRepository.findAll();
+            p.setFinalPrice(null); // mã hết hạn / không dùng -> finalPrice = null
         }
     }
+    public Product getProductById(Long id) {
 
-    public List<Product> searchProducts(String keyword, Double minPrice, Double maxPrice, String direction) {
-        double min = (minPrice != null) ? minPrice : 0;
-        double max = (maxPrice != null) ? maxPrice : Double.MAX_VALUE;
+        Product p = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm ID: " + id));
 
-        Sort sort = "desc".equalsIgnoreCase(direction)
-                ? Sort.by(Sort.Direction.DESC, "price")
-                : Sort.by(Sort.Direction.ASC, "price");
+        // Gán finalPrice
+        applyFinalPrice(p);
 
-        return productRepository.searchProducts(keyword, min, max, sort);
+        // Trả về toàn bộ object sản phẩm kèm ảnh, discountCode, finalPrice
+        return p;
     }
+
+
+
 }

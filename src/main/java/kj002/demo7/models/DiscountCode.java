@@ -1,13 +1,11 @@
 package kj002.demo7.models;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -22,22 +20,22 @@ public class DiscountCode {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String code;
+
     private double discountPercent;
 
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDateTime startDateTime;
 
-    @Enumerated(EnumType.STRING) // phải là STRING
-    @Column(length = 20)           // đủ dài chứa các giá trị Enum
+    private LocalDateTime endDateTime;
+
+    private int quantity;
+
+    @Enumerated(EnumType.STRING)
     private DiscountStatus status = DiscountStatus.ACTIVE;
 
-    @ManyToMany
-    @JoinTable(
-            name = "discount_products",
-            joinColumns = @JoinColumn(name = "discount_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
-    private Set<Product> products;
-
+    // 1 mã giảm giá → N sản phẩm
+    @OneToMany(mappedBy = "discountCode", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<Product> products = new HashSet<>();
 }

@@ -1,11 +1,7 @@
 package kj002.demo7.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.time.LocalDateTime;
@@ -25,13 +21,12 @@ public class Product {
 
     private String brand;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
     private double price;
 
-    @Column(nullable = false)
     private int quantityInStock = 0;
 
     private String screenSize;
@@ -52,25 +47,19 @@ public class Product {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToMany(
-            fetch = FetchType.LAZY,
-            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE},
+            cascade = CascadeType.ALL,
             mappedBy = "product",
             orphanRemoval = true
     )
     @JsonManagedReference
     private List<ProductImage> images;
 
-    @ManyToMany(mappedBy = "products")
-    @JsonIgnore
-    private List<DiscountCode> discountCodes;
+
+    @ManyToOne
+    @JoinColumn(name = "discount_id")
+    private DiscountCode discountCode;
+
+
+    @Transient
+    private Double finalPrice;
 }
-
-
-//Đánh giá sản phẩm
-//    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<ProductReview> reviews;
-
-//Trung bình đánh giá (cache)
-// @Column(name = "average_rating")
-// private Double averageRating = 0.0;
-

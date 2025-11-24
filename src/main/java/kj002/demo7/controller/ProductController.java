@@ -24,17 +24,20 @@ public class ProductController {
         this.productService = productService;
     }
     @GetMapping
-    public ResponseEntity<?> getProduct() {
+    public ResponseEntity<?> getAllProducts() {
         try {
-            List<Product> products = productService.findAll();
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(ApiResponse.success(products,
-                            "get product successfully"));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            List<Product> list = productService.findAllWithFinalPrice();
+
+            return ResponseEntity.ok(
+                    ApiResponse.success(list, "get product successfully")
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
                     .body(ApiResponse.errorServer(e.getMessage()));
         }
     }
+
     @PostMapping
     public ResponseEntity<?> addProduct(@Valid @ModelAttribute ProductDTO productDTO,
                                         BindingResult bindingResult) {
@@ -56,6 +59,18 @@ public class ProductController {
                     .body(ApiResponse.errorServer(e.getMessage()));
         }
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getProduct(@PathVariable Long id) {
+        try {
+            Product product = productService.getProductById(id);
+            return ResponseEntity.ok(ApiResponse.success(product, "Get product successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.notfound(e.getMessage()));
+        }
+    }
+
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         try {
@@ -110,18 +125,5 @@ public class ProductController {
                     .body(ApiResponse.errorServer(e.getMessage()));
         }
     }
-    @GetMapping("/sort")
-    public ResponseEntity<List<Product>> sortByPrice(@RequestParam(defaultValue = "asc") String direction) {
-        List<Product> sortedProducts = productService.sortByPrice(direction);
-        return ResponseEntity.ok(sortedProducts);
-    }
-    @GetMapping("/search")
-    public List<Product> searchProducts(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice,
-            @RequestParam(defaultValue = "asc") String direction
-    ) {
-        return productService.searchProducts(keyword, minPrice, maxPrice, direction);
-    }
+
 }
