@@ -2,17 +2,13 @@ package kj002.demo7.controller;
 
 import jakarta.validation.Valid;
 import kj002.demo7.dtos.DiscountCodeDTO;
-import kj002.demo7.dtos.DiscountUpdateDTO;
 import kj002.demo7.helpers.ApiResponse;
 import kj002.demo7.models.DiscountCode;
-import kj002.demo7.models.Product;
 import kj002.demo7.services.DiscountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/discounts")
@@ -23,22 +19,13 @@ public class DiscountController {
     public DiscountController(DiscountService discountService) {
         this.discountService = discountService;
     }
-
-    // GET ALL DISCOUNT CODES
     @GetMapping
     public ResponseEntity<?> getAllDiscounts() {
         try {
-            List<DiscountCode> list = discountService.findAll();
-
-            if (list.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(ApiResponse.notfound("Không có mã giảm giá nào"));
-            }
-
             return ResponseEntity.ok(
-                    ApiResponse.success(list, "Lấy danh sách mã giảm giá thành công")
+                    ApiResponse.success(discountService.findAll(),
+                            "Lấy danh sách mã giảm giá thành công")
             );
-
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
                     .body(ApiResponse.errorServer(e.getMessage()));
@@ -48,20 +35,35 @@ public class DiscountController {
     public ResponseEntity<?> getDiscountById(@PathVariable Long id) {
         try {
             DiscountCode dc = discountService.getDiscountById(id);
-            return ResponseEntity.ok(ApiResponse.success(dc, "Get discount successfully"));
-        } catch (Exception e) {
+
+            // Convert Entity → DTO trả cho FE
+            DiscountCodeDTO dto = new DiscountCodeDTO();
+            dto.setId(dc.getId());
+            dto.setCode(dc.getCode());
+            dto.setDiscountPercent(dc.getDiscountPercent());
+            dto.setStartDateTime(dc.getStartDateTime());
+            dto.setEndDateTime(dc.getEndDateTime());
+            dto.setQuantity(dc.getQuantity());
+            dto.setStatus(dc.getStatus());
+            dto.setProductIds(
+                    dc.getProducts().stream().map(p -> p.getId()).toList()
+            );
+
+            return ResponseEntity.ok(ApiResponse.success(dto, "Lấy mã giảm giá thành công"));
+
+        } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.notfound(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body(ApiResponse.errorServer(e.getMessage()));
         }
     }
-
-
-    // CREATE DISCOUNT
     @PostMapping
     public ResponseEntity<?> createDiscount(
             @Valid @RequestBody DiscountCodeDTO dto,
-            BindingResult bindingResult
-    ) {
+            BindingResult bindingResult) {
+
         try {
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.badRequest()
@@ -70,28 +72,36 @@ public class DiscountController {
 
             DiscountCode created = discountService.createDiscount(dto);
 
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(ApiResponse.created(created, "Tạo mã giảm giá thành công"));
-
-        } catch (RuntimeException e) {
-            return ResponseEntity.ok(
-                    ApiResponse.success("apply discount successfully", "Discount applied")
+            // Convert Entity → DTO response
+            DiscountCodeDTO resp = new DiscountCodeDTO();
+            resp.setId(created.getId());
+            resp.setCode(created.getCode());
+            resp.setDiscountPercent(created.getDiscountPercent());
+            resp.setStartDateTime(created.getStartDateTime());
+            resp.setEndDateTime(created.getEndDateTime());
+            resp.setQuantity(created.getQuantity());
+            resp.setStatus(created.getStatus());
+            resp.setProductIds(
+                    created.getProducts().stream().map(p -> p.getId()).toList()
             );
 
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ApiResponse.created(resp, "Tạo mã giảm giá thành công"));
 
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.badRequest(e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
                     .body(ApiResponse.errorServer(e.getMessage()));
         }
     }
-
-    // UPDATE DISCOUNT
     @PutMapping("/{id}")
     public ResponseEntity<?> updateDiscount(
             @PathVariable Long id,
-            @Valid @RequestBody DiscountUpdateDTO dto,
-            BindingResult bindingResult
-    ) {
+            @Valid @RequestBody DiscountCodeDTO dto,
+            BindingResult bindingResult) {
+
         try {
             if (bindingResult.hasErrors()) {
                 return ResponseEntity.badRequest()
@@ -102,58 +112,30 @@ public class DiscountController {
 
             DiscountCode updated = discountService.updateDiscount(dto);
 
+            // Convert Entity → DTO response
+            DiscountCodeDTO resp = new DiscountCodeDTO();
+            resp.setId(updated.getId());
+            resp.setCode(updated.getCode());
+            resp.setDiscountPercent(updated.getDiscountPercent());
+            resp.setStartDateTime(updated.getStartDateTime());
+            resp.setEndDateTime(updated.getEndDateTime());
+            resp.setQuantity(updated.getQuantity());
+            resp.setStatus(updated.getStatus());
+            resp.setProductIds(
+                    updated.getProducts().stream().map(p -> p.getId()).toList()
+            );
+
             return ResponseEntity.ok(
-                    ApiResponse.success(updated, "Cập nhật mã giảm giá thành công")
+                    ApiResponse.success(resp, "Cập nhật mã giảm giá thành công")
             );
 
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResponse.notfound(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.badRequest(e.getMessage()));
 
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
                     .body(ApiResponse.errorServer(e.getMessage()));
         }
     }
-
-    // GET PRODUCT FINAL PRICE (AFTER DISCOUNT)
-//    @GetMapping("/product/{productId}")
-//    public ResponseEntity<?> getFinalPrice(@PathVariable Long productId) {
-//        try {
-//            Product p = discountService.getFinalPrice(productId);
-//
-//
-//            return ResponseEntity.ok(
-//                    ApiResponse.success(p, "Lấy giá cuối cùng thành công")
-//            );
-//
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body(ApiResponse.notfound(e.getMessage()));
-//
-//        } catch (Exception e) {
-//            return ResponseEntity.internalServerError()
-//                    .body(ApiResponse.errorServer(e.getMessage()));
-//        }
-//    }
-
-    // USE DISCOUNT FOR PRODUCT
-//    @PostMapping("/use/{productId}")
-//    public ResponseEntity<?> useDiscount(@PathVariable Long productId) {
-//        try {
-//            discountService.useDiscount(productId);
-//
-//            return ResponseEntity.ok(
-//                    ApiResponse.success("Discount applied", "Áp dụng mã giảm giá thành công")
-//            );
-//
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body(ApiResponse.notfound(e.getMessage()));
-//
-//        } catch (Exception e) {
-//            return ResponseEntity.internalServerError()
-//                    .body(ApiResponse.errorServer(e.getMessage()));
-//        }
-//    }
 }

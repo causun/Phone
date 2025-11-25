@@ -23,44 +23,27 @@ public class ProductService {
     private ProductImageRepository productImageRepository;
 
     public ProductService(ProductRepository productRepository,
-                          ProductImageRepository productImageRepository, DiscountService discountService) {
+                          ProductImageRepository productImageRepository,
+                          DiscountService discountService) {
         this.productRepository = productRepository;
         this.productImageRepository = productImageRepository;
         this.discountService = discountService;
     }
+
     public List<Product> findAllWithFinalPrice() {
 
         List<Product> products = productRepository.findAll();
 
         for (Product p : products) {
-
-            // nếu sản phẩm có mã giảm giá
-            if (p.getDiscountCode() != null) {
-
-                DiscountCode dc = p.getDiscountCode();
-
-                // kiểm tra mã giảm giá còn hiệu lực
-                DiscountCode valid = discountService.validateDiscount(dc);
-
-                if (valid != null) {
-                    double discountValue = p.getPrice() * (valid.getDiscountPercent() / 100);
-                    p.setFinalPrice(p.getPrice() - discountValue);
-                } else {
-                    p.setFinalPrice(p.getPrice());
-                }
-
-            } else {
-                p.setFinalPrice(p.getPrice());
-            }
+            applyFinalPrice(p);
         }
 
         return products;
     }
 
-
     private String productImagesFolder = "productImages";
-    public Optional<Product> findById(Long id) {
 
+    public Optional<Product> findById(Long id) {
         return productRepository.findById(id);
     }
 
@@ -78,54 +61,42 @@ public class ProductService {
         product.setCamera(productDTO.getCamera());
         product.setBattery(productDTO.getBattery());
         product.setOs(productDTO.getOs());
-        product.setPrice(productDTO.getPrice());
         product.setColor(productDTO.getColor());
         product.setDescription(productDTO.getDescription());
+        product.setQuantityInStock(productDTO.getQuantityInStock());
 
-        //Lưu sản phẩm vào DB trước để có product_id
+        // Lưu vào DB trước để có ID
         Product productCreated = productRepository.save(product);
 
-        //Xử lý danh sách ảnh upload
+        // Lưu ảnh
         List<ProductImage> productImagesList = new ArrayList<>();
 
         int index = 0;
         for (MultipartFile image : productDTO.getImages()) {
             ProductImage productImage = new ProductImage();
-
-            // Gắn khóa ngoại product_id
             productImage.setProduct(productCreated);
 
-            // Upload file ảnh và lấy đường dẫn lưu
             String imageUrl = UploadService.storeImage(productImagesFolder, image);
             productImage.setImageUrl(imageUrl);
 
-            // Ảnh đầu tiên làm ảnh bìa
-            if (index == 0) {
-                productImage.setThumbnail(true);
-            } else {
-                productImage.setThumbnail(false);
-            }
+            productImage.setThumbnail(index == 0);
 
             productImagesList.add(productImage);
             index++;
         }
 
-        //Lưu danh sách ảnh vào DB
         productImageRepository.saveAll(productImagesList);
 
-        // Gắn lại danh sách ảnh cho product
         productCreated.setImages(productImagesList);
 
-        //Trả về sản phẩm đã tạo
         return productCreated;
     }
 
     public Product update(ProductUpdateDTO productUpdateDTO) throws IOException {
-        //Tìm sản phẩm
+
         Product productExisting = productRepository.findById(productUpdateDTO.getId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm với ID: " + productUpdateDTO.getId()));
 
-        //Cập nhật thông tin
         productExisting.setBrand(productUpdateDTO.getBrand());
         productExisting.setName(productUpdateDTO.getName());
         productExisting.setPrice(productUpdateDTO.getPrice());
@@ -141,34 +112,34 @@ public class ProductService {
         productExisting.setDescription(productUpdateDTO.getDescription());
         productExisting.setStatus(productUpdateDTO.getStatus());
 
-        //Nếu có upload ảnh mới → xóa toàn bộ ảnh cũ và thêm mới
+        // Xử lý ảnh mới
         if (productUpdateDTO.getImages() != null && !productUpdateDTO.getImages().isEmpty()) {
-            // Lấy toàn bộ ảnh cũ trong DB
             List<ProductImage> oldImages = productImageRepository.findByProduct(productExisting);
 
-            // Xóa ảnh cũ cả trong DB lẫn thư mục
             for (ProductImage img : oldImages) {
                 UploadService.deleteImage(img.getImageUrl().substring(UploadService.rootUrl.length()));
                 productImageRepository.delete(img);
             }
 
-            // Thêm ảnh mới
             List<ProductImage> newImages = new ArrayList<>();
             int index = 0;
             for (MultipartFile image : productUpdateDTO.getImages()) {
+
                 String imageUrl = UploadService.storeImage(productImagesFolder, image);
 
                 ProductImage productImage = new ProductImage();
                 productImage.setProduct(productExisting);
                 productImage.setImageUrl(imageUrl);
-                productImage.setThumbnail(index == 0); // ảnh đầu tiên là bìa
+                productImage.setThumbnail(index == 0);
+
                 newImages.add(productImage);
                 index++;
             }
+
             productImageRepository.saveAll(newImages);
         }
 
-        // Nếu có danh sách ảnh cần xóa riêng (frontend gửi deleteImagesId)
+        // Xóa ảnh theo ID (frontend gửi)
         if (productUpdateDTO.getDeleteImagesId() != null && !productUpdateDTO.getDeleteImagesId().isEmpty()) {
             List<ProductImage> deleteList = productImageRepository.findAllById(productUpdateDTO.getDeleteImagesId());
 
@@ -178,71 +149,66 @@ public class ProductService {
             }
         }
 
-        // Đảm bảo chỉ có 1 ảnh thumbnail
+        // Đảm bảo chỉ có 1 thumbnail
         List<ProductImage> remainingImages = productImageRepository.findByProduct(productExisting);
         boolean hasThumbnail = remainingImages.stream().anyMatch(ProductImage::isThumbnail);
+
         if (!hasThumbnail && !remainingImages.isEmpty()) {
             ProductImage first = remainingImages.get(0);
             first.setThumbnail(true);
             productImageRepository.save(first);
-        } else {
-            // Nếu có nhiều thumbnail → chỉ giữ 1
-            boolean firstFound = false;
-            for (ProductImage img : remainingImages) {
-                if (img.isThumbnail()) {
-                    if (firstFound) {
-                        img.setThumbnail(false);
-                        productImageRepository.save(img);
-                    } else {
-                        firstFound = true;
-                    }
-                }
-            }
         }
 
         return productRepository.save(productExisting);
     }
+
     public void delete(Product product) throws IOException {
         List<ProductImage> imagesTODelete = product.getImages();
-        if (imagesTODelete.size() > 0) {
+        if (!imagesTODelete.isEmpty()) {
             for (ProductImage imageUrl : imagesTODelete) {
                 UploadService.deleteImage(imageUrl.getImageUrl().substring(UploadService.rootUrl.length()));
             }
         }
         productRepository.delete(product);
     }
-    //search
+
     public List<Product> searchByName(String keyword) {
-        return productRepository.findByNameContainingIgnoreCase(keyword);
+        List<Product> products = productRepository.findByNameContainingIgnoreCase(keyword);
+
+        for (Product p : products) {
+            applyFinalPrice(p);
+        }
+
+        return products;
     }
+
     private void applyFinalPrice(Product p) {
 
-        if (p.getDiscountCode() == null) {
-            p.setFinalPrice(null);  // không có discount -> finalPrice = null
+        DiscountCode dc = p.getDiscountCode();
+
+        if (dc == null) {
+            p.setFinalPrice(null);
             return;
         }
 
-        DiscountCode valid = discountService.validateDiscount(p.getDiscountCode());
+        DiscountCode valid = discountService.validateDiscount(dc);
 
         if (valid != null) {
             double discountValue = p.getPrice() * (valid.getDiscountPercent() / 100);
             p.setFinalPrice(p.getPrice() - discountValue);
         } else {
-            p.setFinalPrice(null); // mã hết hạn / không dùng -> finalPrice = null
+            p.setFinalPrice(null);
         }
     }
+
     public Product getProductById(Long id) {
 
         Product p = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm ID: " + id));
 
-        // Gán finalPrice
         applyFinalPrice(p);
 
-        // Trả về toàn bộ object sản phẩm kèm ảnh, discountCode, finalPrice
         return p;
     }
-
-
 
 }

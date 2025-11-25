@@ -32,9 +32,8 @@ public class DiscountCode {
     private int quantity;
 
     @Enumerated(EnumType.STRING)
-    private DiscountStatus status = DiscountStatus.ACTIVE;
+    private DiscountStatus status;
 
-    // 1 mã giảm giá → N sản phẩm
     @OneToMany(mappedBy = "discountCode", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<Product> products = new HashSet<>();

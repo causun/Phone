@@ -27,7 +27,7 @@ public class Product {
     @Column(nullable = false)
     private double price;
 
-    private int quantityInStock = 0;
+    private Integer quantityInStock;
 
     private String screenSize;
     private String ram;

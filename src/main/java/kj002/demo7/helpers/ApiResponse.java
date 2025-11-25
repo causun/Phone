@@ -1,58 +1,94 @@
 package kj002.demo7.helpers;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-@Data
-@AllArgsConstructor
 public class ApiResponse<T> {
+
     private T data;
     private String message;
     private int status;
-   @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<String> errors;
-   public ApiResponse(T data,String message,int status){
-       this.data = data;
-       this.message = message;
-       this.status = status;
-   }
-    //success
-    public static <T> ApiResponse<T>
-            success(T data,String message){
-        return new ApiResponse<>
-                (data,message,200);
+
+    public ApiResponse() {}
+
+    public ApiResponse(T data, String message, int status) {
+        this.data = data;
+        this.message = message;
+        this.status = status;
     }
-    //created
-    public static <T> ApiResponse<T>
-    created(T data,String message){
-        return new ApiResponse<>
-                (data,message,201);
+
+    // ========================
+    // GETTER – SETTER
+    // ========================
+
+    public T getData() {
+        return data;
     }
-    //not found
-    public static <T> ApiResponse<T>
-    notfound(String message){
-        return new ApiResponse<>
-                (null,message,404,null);
+
+    public void setData(T data) {
+        this.data = data;
     }
-    //badRequest
-    public static <T> ApiResponse<Object>
-    badRequest(BindingResult bindingResult){
-        List<String> errorsBadrequest = bindingResult.getAllErrors().stream()
-                    .map(ObjectError::getDefaultMessage)
-                    .collect(Collectors.toList());
-        return  new ApiResponse<>
-                (null,"Validation errors",400,errorsBadrequest);
+
+    public String getMessage() {
+        return message;
     }
-    //error server
-    public static <T> ApiResponse<T>
-    errorServer(String message){
-        return new ApiResponse<>(null,message,
-                500,null);
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+
+    // ========================
+    // RESPONSE TEMPLATES
+    // ========================
+
+    /** 200 OK */
+    public static <T> ApiResponse<T> success(T data, String message) {
+        return new ApiResponse<>(data, message, 200);
+    }
+
+    /** 201 CREATED */
+    public static <T> ApiResponse<T> created(T data, String message) {
+        return new ApiResponse<>(data, message, 201);
+    }
+
+    /** 400 BAD REQUEST (Validation errors) */
+    public static ApiResponse<Object> badRequest(BindingResult bindingResult) {
+        return new ApiResponse<>(
+                bindingResult.getAllErrors(),
+                "Dữ liệu không hợp lệ!",
+                400
+        );
+    }
+
+    /** 400 BAD REQUEST (normal string error) */
+    public static ApiResponse<Object> badRequest(String message) {
+        return new ApiResponse<>(
+                null,
+                message,
+                400
+        );
+    }
+
+    /** 404 NOT FOUND */
+    public static ApiResponse<Object> notfound(String message) {
+        return new ApiResponse<>(null, message, 404);
+    }
+
+    /** 500 INTERNAL SERVER ERROR */
+    public static ApiResponse<Object> errorServer(String message) {
+        return new ApiResponse<>(null, message, 500);
+    }
+
+    /** CUSTOM */
+    public static <T> ApiResponse<T> custom(T data, String message, int status) {
+        return new ApiResponse<>(data, message, status);
     }
 }

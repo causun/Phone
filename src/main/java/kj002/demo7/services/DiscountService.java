@@ -1,7 +1,6 @@
 package kj002.demo7.services;
 
 import kj002.demo7.dtos.DiscountCodeDTO;
-import kj002.demo7.dtos.DiscountUpdateDTO;
 import kj002.demo7.models.*;
 import kj002.demo7.repositories.DiscountCodeRepository;
 import kj002.demo7.repositories.ProductRepository;
@@ -24,160 +23,177 @@ public class DiscountService {
         this.productRepository = productRepository;
     }
     public List<DiscountCode> findAll() {
-        return discountCodeRepository.findAll();
+        List<DiscountCode> list = discountCodeRepository.findAll();
+        for (DiscountCode dc : list) {
+            validateDiscount(dc);
+        }
+        return list;
     }
     public DiscountCode validateDiscount(DiscountCode dc) {
-
         if (dc == null) return null;
 
         LocalDateTime now = LocalDateTime.now();
 
-        if (now.isAfter(dc.getEndDateTime())) {
-            dc.setStatus(DiscountStatus.EXPIRED);
-            discountCodeRepository.save(dc);
-            return null;
-        }
-
-        if (now.isBefore(dc.getStartDateTime())) {
-            dc.setStatus(DiscountStatus.NOT_STARTED);
-            discountCodeRepository.save(dc);
-            return null;
-        }
-
         if (dc.getQuantity() <= 0) {
             dc.setStatus(DiscountStatus.OUT_OF_STOCK);
-            discountCodeRepository.save(dc);
-            return null;
+        } else if (now.isAfter(dc.getEndDateTime())) {
+            dc.setStatus(DiscountStatus.EXPIRED);
+        } else if (now.isBefore(dc.getStartDateTime())) {
+            dc.setStatus(DiscountStatus.NOT_STARTED);
+        } else {
+            dc.setStatus(DiscountStatus.ACTIVE);
         }
 
-        dc.setStatus(DiscountStatus.ACTIVE);
         discountCodeRepository.save(dc);
-
-        return dc;
+        return dc.getStatus() == DiscountStatus.ACTIVE ? dc : null;
     }
 
+    private void autoSetStatus(DiscountCode dc) {
+        validateDiscount(dc);
+    }
+    private void validateProductForDiscount(Product p) {
 
-    // Validate mã
-    private DiscountCode validate(DiscountCode dc) {
-
-        LocalDateTime now = LocalDateTime.now();
-
-        if (now.isAfter(dc.getEndDateTime())) {
-            dc.setStatus(DiscountStatus.EXPIRED);
-            discountCodeRepository.save(dc);
-            return null;
+        // Kiểm tra tồn kho hợp lệ
+        if (p.getQuantityInStock() == null || p.getQuantityInStock() <= 0) {
+            throw new RuntimeException("Sản phẩm '" + p.getName() + "' hết hàng!");
         }
 
-        if (now.isBefore(dc.getStartDateTime())) {
-            dc.setStatus(DiscountStatus.NOT_STARTED);
-            discountCodeRepository.save(dc);
-            return null;
+        // Kiểm tra trạng thái sản phẩm
+        if (p.getStatus() == ProductStatus.INACTIVE) {
+            throw new RuntimeException("Sản phẩm '" + p.getName() + "' đang INACTIVE!");
         }
 
-        if (dc.getQuantity() <= 0) {
-            dc.setStatus(DiscountStatus.OUT_OF_STOCK);
-            discountCodeRepository.save(dc);
-            return null;
-        }
+        //Kiểm tra mã giảm giá cũ của sản phẩm
+        DiscountCode old = p.getDiscountCode();
+        if (old != null) {
+            validateDiscount(old);
+            if (old.getStatus() == DiscountStatus.ACTIVE ||
+                    old.getStatus() == DiscountStatus.NOT_STARTED) {
 
-        dc.setStatus(DiscountStatus.ACTIVE);
-        discountCodeRepository.save(dc);
-        return dc;
+                throw new RuntimeException(
+                        "Sản phẩm '" + p.getName() + "' đang có mã giảm giá còn hiệu lực!");
+            }
+            if (old.getStatus() == DiscountStatus.EXPIRED) {
+                p.setDiscountCode(null);
+                productRepository.save(p);
+            }
+        }
     }
 
     public DiscountCode createDiscount(DiscountCodeDTO dto) {
 
-        // Check mã tồn tại
         if (discountCodeRepository.findByCode(dto.getCode()) != null) {
             throw new RuntimeException("Mã giảm giá đã tồn tại!");
         }
 
-        // Check thời gian hợp lệ
+        LocalDateTime now = LocalDateTime.now();
+
+        if (dto.getStartDateTime().isBefore(now)) {
+            throw new RuntimeException("StartDate không được ở quá khứ");
+        }
+        if (dto.getEndDateTime().isBefore(now)) {
+            throw new RuntimeException("EndDate không được ở quá khứ");
+        }
+
         if (dto.getStartDateTime().isAfter(dto.getEndDateTime())) {
             throw new RuntimeException("StartDate phải nhỏ hơn EndDate");
         }
 
-        // Lấy danh sách sản phẩm
         Set<Product> products = new HashSet<>(productRepository.findAllById(dto.getProductIds()));
-
         if (products.isEmpty()) {
             throw new RuntimeException("Không có sản phẩm hợp lệ!");
         }
 
-        // KIỂM TRA MÃ GIẢM GIÁ CŨ CỦA SẢN PHẨM
+        // Check sản phẩm
         for (Product p : products) {
-
-            DiscountCode old = p.getDiscountCode();
-
-            if (old != null) {
-                DiscountStatus status = old.getStatus();
-
-                boolean stillActive =
-                        status == DiscountStatus.ACTIVE ||
-                                status == DiscountStatus.NOT_STARTED ||
-                                status == DiscountStatus.OUT_OF_STOCK;
-
-                if (stillActive) {
-                    throw new RuntimeException(
-                            "Sản phẩm '" + p.getName() + "' đang có mã giảm giá còn hiệu lực!");
-                }
-
-                // Nếu mã cũ EXPIRED → tự động gỡ
-                if (status == DiscountStatus.EXPIRED) {
-                    p.setDiscountCode(null);
-                    productRepository.save(p); // save detach
-                }
-            }
+            validateProductForDiscount(p);
         }
 
-        // TẠO MÃ GIẢM GIÁ MỚI
+        // Check tổng tồn kho
+        int totalStock = products.stream()
+                .mapToInt(p -> p.getQuantityInStock() == null ? 0 : p.getQuantityInStock())
+                .sum();
+
+        if (dto.getQuantity() > totalStock) {
+            throw new RuntimeException("Số lượng mã giảm giá không được lớn hơn tổng tồn kho (" + totalStock + ")");
+        }
+
+        // Tạo discount
         DiscountCode dc = new DiscountCode();
         dc.setCode(dto.getCode().trim().toUpperCase());
         dc.setDiscountPercent(dto.getDiscountPercent());
         dc.setStartDateTime(dto.getStartDateTime());
         dc.setEndDateTime(dto.getEndDateTime());
         dc.setQuantity(dto.getQuantity());
-        dc.setStatus(DiscountStatus.ACTIVE);
+        dc.setProducts(products);
 
-        // Gán mã mới cho sản phẩm
+        autoSetStatus(dc);
+
         for (Product p : products) {
             p.setDiscountCode(dc);
+            productRepository.save(p);
         }
-
-        dc.setProducts(products);
 
         return discountCodeRepository.save(dc);
     }
+    public DiscountCode updateDiscount(DiscountCodeDTO dto) {
 
-    public DiscountCode updateDiscount(DiscountUpdateDTO dto) {
-
-        // 1. Lấy discount hiện có
+        // 1. Lấy ra discount hiện tại
         DiscountCode dc = discountCodeRepository.findById(dto.getId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy mã giảm giá"));
 
-        // 2. Validate ngày
+        LocalDateTime now = LocalDateTime.now();
+
+
+        if (dto.getStatus() == DiscountStatus.EXPIRED) {
+            dc.setCode(dto.getCode().trim().toUpperCase());
+            dc.setDiscountPercent(dto.getDiscountPercent());
+            dc.setStartDateTime(dto.getStartDateTime());
+            dc.setEndDateTime(dto.getEndDateTime());
+            dc.setQuantity(dto.getQuantity());
+
+            // Set trạng thái EXPIRED
+            dc.setStatus(DiscountStatus.EXPIRED);
+
+            return discountCodeRepository.save(dc);
+        }
+
+        // Không cho phép startDate / endDate ở quá khứ
+        if (dto.getStartDateTime().isBefore(now)) {
+            throw new RuntimeException("StartDate không được ở quá khứ");
+        }
+        if (dto.getEndDateTime().isBefore(now)) {
+            throw new RuntimeException("EndDate không được ở quá khứ");
+        }
+
+        // Check start < end
         if (dto.getStartDateTime().isAfter(dto.getEndDateTime())) {
             throw new RuntimeException("StartDate phải nhỏ hơn EndDate");
         }
 
-        // 3. Lấy danh sách sản phẩm mới
-        Set<Product> newProducts = new HashSet<>();
-        if (dto.getProductIds() != null && !dto.getProductIds().isEmpty()) {
-            newProducts.addAll(productRepository.findAllById(dto.getProductIds()));
-
-            if (newProducts.isEmpty()) {
-                throw new RuntimeException("Danh sách sản phẩm không hợp lệ");
-            }
-        } else {
-            // Nếu không gửi productIds thì giữ nguyên các sản phẩm cũ
-            newProducts = dc.getProducts() != null
-                    ? new HashSet<>(dc.getProducts())
-                    : new HashSet<>();
+        // Load danh sách sản phẩm mới
+        Set<Product> newProducts = new HashSet<>(productRepository.findAllById(dto.getProductIds()));
+        if (newProducts.isEmpty()) {
+            throw new RuntimeException("Danh sách sản phẩm không hợp lệ");
         }
 
-        // 4. Gỡ mã giảm giá khỏi sản phẩm cũ (nếu không còn trong newProducts)
-        Set<Product> oldProducts = dc.getProducts() != null ? dc.getProducts() : new HashSet<>();
+        // Check từng product: tồn kho, ACTIVE, không có discount khác còn hiệu lực
+        for (Product p : newProducts) {
+            validateProductForDiscount(p);
+        }
 
+        // Check tổng tồn kho
+        int totalStock = newProducts.stream()
+                .mapToInt(p -> p.getQuantityInStock() == null ? 0 : p.getQuantityInStock())
+                .sum();
+
+        if (dto.getQuantity() > totalStock) {
+            throw new RuntimeException("Số lượng mã giảm giá (" + dto.getQuantity()
+                    + ") không được lớn hơn tổng tồn kho (" + totalStock + ")");
+        }
+
+        // Gỡ discount khỏi các sản phẩm cũ không còn trong danh sách mới
+        Set<Product> oldProducts = dc.getProducts();
         for (Product oldP : oldProducts) {
             if (!newProducts.contains(oldP)) {
                 oldP.setDiscountCode(null);
@@ -185,33 +201,7 @@ public class DiscountService {
             }
         }
 
-        // 5. Kiểm tra sản phẩm mới có mã giảm giá khác còn hiệu lực không
-        for (Product p : newProducts) {
-            DiscountCode other = p.getDiscountCode();
-
-            if (other != null && !other.getId().equals(dc.getId())) {
-
-                DiscountStatus st = other.getStatus();
-
-                boolean stillActive =
-                        st == DiscountStatus.ACTIVE ||
-                                st == DiscountStatus.NOT_STARTED ||
-                                st == DiscountStatus.OUT_OF_STOCK;
-
-                if (stillActive) {
-                    throw new RuntimeException(
-                            "Sản phẩm '" + p.getName() + "' đang có mã giảm giá khác!");
-                }
-
-                // Nếu mã cũ đã EXPIRED → tự động gỡ
-                if (st == DiscountStatus.EXPIRED) {
-                    p.setDiscountCode(null);
-                    productRepository.save(p);
-                }
-            }
-        }
-
-        // 6. Update fields của DiscountCode
+        // Cập nhật thông tin DiscountCode
         dc.setCode(dto.getCode().trim().toUpperCase());
         dc.setDiscountPercent(dto.getDiscountPercent());
         dc.setStartDateTime(dto.getStartDateTime());
@@ -219,48 +209,29 @@ public class DiscountService {
         dc.setQuantity(dto.getQuantity());
         dc.setProducts(newProducts);
 
-        // 7. Update STATUS
-        if (dto.getStatus() != null) {
-            // User truyền status → dùng trực tiếp
-            dc.setStatus(dto.getStatus());
-        } else {
-            // Không truyền → tự tính
-            LocalDateTime now = LocalDateTime.now();
+        // Tự set lại status theo thời gian + quantity
+        autoSetStatus(dc);
 
-            if (dc.getQuantity() <= 0) {
-                dc.setStatus(DiscountStatus.OUT_OF_STOCK);
-            } else if (now.isAfter(dc.getEndDateTime())) {
-                dc.setStatus(DiscountStatus.EXPIRED);
-            } else if (now.isBefore(dc.getStartDateTime())) {
-                dc.setStatus(DiscountStatus.NOT_STARTED);
-            } else {
-                dc.setStatus(DiscountStatus.ACTIVE);
-            }
-        }
-        // 8. Gán lại discount cho các sản phẩm mới
+        // Gán lại discount cho các sản phẩm mới
         for (Product p : newProducts) {
             p.setDiscountCode(dc);
             productRepository.save(p);
         }
 
-        // 9. Lưu vào DB
         return discountCodeRepository.save(dc);
     }
+
+
     public DiscountCode getDiscountById(Long id) {
 
         DiscountCode dc = discountCodeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy mã giảm giá với ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy mã giảm giá"));
 
-        // Validate trạng thái trước khi trả về
         validateDiscount(dc);
 
-        // Lấy danh sách sản phẩm đầy đủ gắn với mã giảm giá
         List<Product> productList = productRepository.findByDiscountCode(dc);
-
-        // Convert List -> Set
         dc.setProducts(new HashSet<>(productList));
 
         return dc;
     }
-
 }
