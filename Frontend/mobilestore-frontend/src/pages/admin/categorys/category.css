@@ -1,0 +1,9 @@
+.category-container { padding: 20px; }
+.category-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+.category-search { padding:5px 10px; border-radius:5px; border:1px solid #ccc; margin-left:10px; }
+
+.category-table { width:100%; border-collapse:collapse; }
+.category-table th, .category-table td { border:1px solid #ddd; padding:8px; text-align:center; }
+.category-table th { background:#007bff; color:white; }
+.category-table tr:nth-child(even){ background:#f2f2f2; }
+.category-table tr:hover{ background:#ddd; }

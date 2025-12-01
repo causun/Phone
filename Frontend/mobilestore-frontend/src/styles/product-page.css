@@ -1,0 +1,14 @@
+/* GRID */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px,1fr));
+  gap: 2rem;
+}
+
+/* PRODUCT CARD */
+.product-card img {
+  transition: transform 0.3s ease;
+}
+.product-card:hover img {
+  transform: scale(1.05);
+}

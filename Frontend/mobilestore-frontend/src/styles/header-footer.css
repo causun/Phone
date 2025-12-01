@@ -1,0 +1,28 @@
+.user-header {
+  background: #fff;
+  border-bottom: 1px solid #e5e5e5;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.user-header .logo {
+  letter-spacing: 1px;
+}
+
+.user-footer {
+  background: #f9f9f9;
+  border-top: 1px solid #e5e5e5;
+  color: #666;
+}
+
+.cart-count {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: #ff4d4d;
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 50%;
+}
