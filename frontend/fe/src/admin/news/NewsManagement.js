@@ -16,16 +16,12 @@ function NewsManagement() {
   const formatDate = (d) => {
     if (!d) return "-";
 
-    // Backend trả LocalDateTime dạng mảng
     if (Array.isArray(d)) {
-      // [year, month, day, hour, minute, second]
       return `${d[2]}/${d[1]}/${d[0]}`;
     }
 
     const date = new Date(d);
-    return isNaN(date)
-      ? "-"
-      : date.toLocaleDateString("vi-VN");
+    return isNaN(date) ? "-" : date.toLocaleDateString("vi-VN");
   };
 
   /* ================= LOAD DATA (GIỮ NGUYÊN LOGIC) ================= */
@@ -41,7 +37,6 @@ function NewsManagement() {
       })
       .catch((err) => {
         console.error("Load news error:", err.response?.data);
-        // 401 sẽ được interceptor xử lý
       })
       .finally(() => setLoading(false));
   }, []);
@@ -101,6 +96,9 @@ function NewsManagement() {
               <tr>
                 <th>Tiêu đề</th>
                 <th>Ngày đăng</th>
+                <th>👁 Lượt xem</th>
+                <th>❤️ Lượt thích</th>
+                <th>💬 Bình luận</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -108,11 +106,25 @@ function NewsManagement() {
             <tbody>
               {filteredNews.map((n) => (
                 <tr key={n.id}>
-                  <td title={n.title}>{n.title}</td>
+                  <td className="news-title" title={n.title}>
+                    {n.title}
+                  </td>
 
                   <td>{formatDate(n.createdAt)}</td>
 
-                  <td>
+                  <td className="text-center">
+                    {n.viewCount ?? 0}
+                  </td>
+
+                  <td className="text-center">
+                    {n.likeCount ?? 0}
+                  </td>
+
+                  <td className="text-center">
+                    {n.commentCount ?? 0}
+                  </td>
+
+                  <td className="news-actions">
                     <button
                       className="btn-edit"
                       onClick={() =>
