@@ -1,0 +1,81 @@
+.admin-orders {
+  max-width: 1350px;
+  margin: 80px auto;
+  padding: 20px;
+  font-family: "Segoe UI", sans-serif;
+  color: #000;
+  background: #fff;
+}
+
+.admin-orders h2 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #111;
+}
+
+.admin-orders table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e5e5;
+}
+
+.admin-orders thead th {
+  background: #e53935; /* đồng bộ màu header */
+  color: #fff;
+  padding: 14px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.admin-orders tbody tr {
+  transition: background 0.2s;
+}
+
+.admin-orders tbody tr:hover {
+  background: #fafafa;
+}
+
+.admin-orders td {
+  padding: 14px;
+  border-bottom: 1px solid #f1f1f1;
+  color: #000;
+}
+
+/* status colors */
+.st-PENDING {
+  color: #f0ad4e;
+  font-weight: 600;
+}
+.st-CONFIRMED {
+  color: #0275d8;
+  font-weight: 600;
+}
+.st-SHIPPING {
+  color: #5bc0de;
+  font-weight: 600;
+}
+.st-COMPLETED {
+  color: #5cb85c;
+  font-weight: 600;
+}
+.st-CANCELLED {
+  color: #d9534f;
+  font-weight: 600;
+}
+
+select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #bbb;
+  color: #000;
+  background: #fff;
+}
+
+select:focus {
+  outline: none;
+  border-color: #e53935;
+}
