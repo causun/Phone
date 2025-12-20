@@ -1,0 +1,16 @@
+# Backend (Spring Boot)
+backend/target/
+backend/.env
+
+# React
+frontend/node_modules/
+frontend/build/
+
+# Flutter
+flutter/build/
+flutter/.dart_tool/
+flutter/.flutter-plugins
+flutter/.flutter-plugins-dependencies
+
+# OS
+.DS_Store
