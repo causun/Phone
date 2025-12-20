@@ -40,8 +40,6 @@ public class Product {
     private String battery;
     private String os;
     private String color;
-    //hello cả nh
-
     @Column(columnDefinition = "TEXT")
     private String description;
 
