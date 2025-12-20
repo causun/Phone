@@ -10,6 +10,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.11.0",
     "bootstrap": "^5.3.8",
+    "html-react-parser": "^5.2.11",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.556.0",
     "react": "^19.1.1",

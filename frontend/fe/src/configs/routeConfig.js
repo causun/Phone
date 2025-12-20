@@ -7,6 +7,8 @@ import ResetPasswordPage from "../pages/ResetPasswordPage";
 import VerifyOtpPage from "../pages/VerifyOtpPage";
 import ChangePasswordPage from "../pages/ChangePasswordPage";
 import ProfilePage from "../pages/ProfilePage";
+import NewsUser from "../pages/NewsUser";
+import NewsDetail from "../pages/NewsDetail";
 
 import ProductDetail from "../pages/ProductDetail";
 import CartPage from "../pages/CartPage";
@@ -17,7 +19,6 @@ import ComparePage from "../pages/ComparePage";
 import ProductReviews from "../components/review/ProductReviews";
 import ReviewModal from "../components/review/ReviewModal";
 
-// ================= ADMIN PAGES =================
 import AdminLoginPage from "../pages/AdminLoginPage";
 
 import HomePageAdmin from "../admin/page/HomePageAdmin";
@@ -36,10 +37,6 @@ import AddNews from "../admin/news/AddNews";
 import EditNews from "../admin/news/EditNews";
 
 
-// =================================================
-// ================= PUBLIC ROUTES =================
-// =================================================
-
 export const publicRoutes = [
   { path: "/", element: <HomePage /> },
 
@@ -52,6 +49,9 @@ export const publicRoutes = [
   { path: "/product/:id", element: <ProductDetail /> },
   { path: "/cart", element: <CartPage /> },
   { path: "/checkout", element: <CheckoutPage /> },
+  { path: "/news", element: <NewsUser /> },
+{ path: "/news/:id", element: <NewsDetail /> },
+
 
   { path: "/product-reviews/:productId", element: <ProductReviews /> },
   { path: "/review-modal", element: <ReviewModal /> },
