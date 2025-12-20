@@ -1,0 +1,73 @@
+.auth-container {
+  width: 400px;
+  margin: 100px auto;
+  padding: 30px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  text-align: center;
+}
+.auth-container input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+}
+.auth-container button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.auth-container select {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+}
+
+.avatar-box {
+  text-align: left;
+  margin: 10px 0;
+}
+
+.avatar-box label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.error {
+  border: 1px solid red !important;
+}
+
+.error-text {
+  color: red;
+  font-size: 13px;
+  text-align: left;
+  display: block;
+  margin-top: -6px;
+  margin-bottom: 6px;
+}
+
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-field input {
+  width: 100%;
+  padding-right: 40px; /* Chừa chỗ cho con mắt */
+}
+
+.eye-btn {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+}

@@ -1,0 +1,389 @@
+/* ================================================= */
+/* 1. CẤU HÌNH CHUNG & LAYOUT TRANG WEB             */
+/* ================================================= */
+.order-detail-page {
+  padding: 30px 50px;
+  background-color: #f4f7f9;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Container bọc toàn bộ giao diện web để ẩn khi in */
+.web-ui-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+}
+
+/* ================================================= */
+/* 2. HEADER & TRẠNG THÁI (STATUS)                  */
+/* ================================================= */
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.order-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.back-icon {
+  cursor: pointer;
+  color: #333;
+  padding: 8px; /* Tạo vùng đệm xung quanh để dễ click */
+  margin-right: 10px;
+  border-radius: 50%; /* Làm nền tròn khi hover */
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-icon:hover {
+  background-color: #e0e0e0; /* Hiệu ứng nền xám nhẹ khi di chuột vào */
+  color: #000;
+  transform: scale(1.1); /* Phóng to nhẹ khi hover */
+}
+
+.order-info h1 {
+  font-size: 26px;
+  margin: 0;
+  color: #1a1a1a;
+}
+
+.order-date {
+  color: #666;
+  margin: 4px 0 0 0;
+}
+
+.print-button {
+  background: white;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.print-button:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+/* Thanh trạng thái */
+.order-status-section {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between; /* Đẩy chữ sang trái, nút sang phải */
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.status-container {
+    display: flex;
+    flex-direction: column; /* Chữ "Trạng thái hiện tại" ở trên, Badge ở dưới */
+    gap: 8px;
+}
+
+.status-label {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.status-badge-wrapper {
+    display: inline-block;
+}
+
+/* Dropdown cập nhật trạng thái */
+.update-dropdown-container {
+  position: relative;
+}
+
+.update-status-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #3b82f6;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.status-options-menu {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  z-index: 100;
+  min-width: 180px;
+  overflow: hidden;
+}
+
+.opt-btn {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.opt-btn:hover { background: #f3f4f6; }
+.opt-btn.approve { color: #10b981; }
+.opt-btn.reject { color: #ef4444; border-top: 1px solid #f3f4f6; }
+
+/* Badge trạng thái */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.status-0 { background: #fff7ed; color: #ea580c; border: 1px solid #ffedd5; } /* Cam - Chờ */
+.status-1 { background: #f0fdf4; color: #16a34a; border: 1px solid #dcfce7; } /* Xanh - Duyệt */
+.status-2 { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; } /* Đỏ - Hủy */
+/* ================================================= */
+/* 3. CHI TIẾT ĐƠN HÀNG (SẢN PHẨM & THANH TOÁN)     */
+/* ================================================= */
+.order-content-layout {
+  display: flex;
+  gap: 24px;
+}
+
+.left-column { flex: 1.8; }
+.right-column { flex: 1.2; }
+
+/* Sản phẩm */
+.product-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.product-main-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.product-image {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f9fafb;
+}
+
+.product-name {
+  font-weight: 600;
+  margin: 0;
+  color: #111827;
+}
+
+.product-price-single {
+  color: #6b7280;
+  margin: 4px 0 0 0;
+  font-size: 14px;
+}
+
+.product-quantity-right {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Thanh toán */
+.payment-detail-card p {
+  display: flex;
+  justify-content: space-between;
+  margin: 12px 0;
+  color: #4b5563;
+}
+
+.total-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  font-weight: 700;
+}
+
+.total-amount-large {
+  font-size: 22px;
+  color: #ef4444;
+}
+
+/* Thông tin khách hàng */
+.info-label {
+  font-size: 12px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.info-value {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 12px;
+  display: block;
+}
+
+/* ================================================= */
+/* 4. CẤU HÌNH IN (MEDIA PRINT) - CHUẨN SHOPEE      */
+/* ================================================= */
+.print-only {
+  display: none;
+}
+
+@media print {
+  /* Ẩn mọi thành phần Web UI */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Hiển thị vùng hóa đơn */
+  .print-only, .print-only * {
+    visibility: visible;
+  }
+
+  /* Thiết lập trang A5 */
+  @page {
+    size: A5;
+    margin: 5mm;
+  }
+
+  .print-only {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 138mm; /* Khớp chiều rộng A5 trừ lề */
+    background: white;
+    color: black;
+    font-family: Arial, sans-serif;
+  }
+
+  .invoice-container {
+    border: 2px solid #000;
+    padding: 10px;
+  }
+
+  /* Barcode & Mã ĐH */
+  .invoice-header-compact {
+    text-align: center;
+    border-bottom: 2px dashed #000;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+  }
+
+  .barcode-placeholder {
+    font-size: 28px;
+    letter-spacing: 3px;
+    line-height: 1;
+  }
+
+  /* Grid Từ/Đến */
+  .shipping-grid {
+    display: flex;
+    border: 1.5px solid #000;
+    margin-bottom: 10px;
+  }
+
+  .shipping-box {
+    flex: 1;
+    padding: 8px;
+    border-right: 1.5px solid #000;
+  }
+
+  .shipping-box:last-child {
+    border-right: none;
+  }
+
+  .print-label {
+    font-size: 10px;
+    text-decoration: underline;
+    font-weight: bold;
+  }
+
+  .print-address {
+    font-size: 13px;
+    font-weight: bold;
+    margin-top: 4px;
+  }
+
+  /* Bảng sản phẩm */
+  .invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+  }
+
+  .invoice-table th, .invoice-table td {
+    border: 1.5px solid #000;
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  /* Phần tổng kết */
+  .invoice-summary-compact {
+    display: flex;
+    justify-content: space-between;
+    border-top: 2px dashed #000;
+    padding-top: 10px;
+  }
+
+  .print-note {
+    width: 55%;
+    font-size: 11px;
+    font-style: italic;
+  }
+
+  .print-total {
+    text-align: right;
+  }
+
+  .print-grand-total {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 2px;
+  }
+
+  .invoice-footer-minimal {
+    margin-top: 15px;
+    font-size: 10px;
+    text-align: left;
+  }
+}
+

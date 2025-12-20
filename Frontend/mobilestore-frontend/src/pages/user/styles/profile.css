@@ -1,0 +1,167 @@
+.profile-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2rem 1rem;
+    background-color: #f8f9fa;
+}
+
+.profile-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 600px;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Tạo khoảng cách cố định với tiêu đề */
+    margin-bottom: 2rem;
+}
+
+.back-btn {
+    background: #ffffff; /* Nền trắng */
+    border: 1px solid #e0e0e0; /* Viền mảnh để trông sang hơn */
+    width: 48px;  /* Tăng kích thước nút */
+    height: 48px; /* Tăng kích thước nút */
+    border-radius: 12px; /* Bo góc vuông vức hiện đại thay vì hình tròn */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* Đổ bóng nhẹ */
+    color: #333;
+}
+
+.back-btn:hover {
+    background: #f8f9fa;
+    transform: translateY(-2px); /* Nhấc nhẹ nút lên khi hover */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    color: #0a84ff; /* Đổi màu icon sang xanh khi hover */
+    border-color: #0a84ff;
+}
+
+.back-btn:active {
+    transform: scale(0.95); /* Hiệu ứng nhấn nút */
+}
+
+.title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1d1d1f;
+    margin: 0;
+    flex: 1; /* Để title chiếm không gian còn lại */
+}
+
+.avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.avatar-preview-box {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+    background: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #0a84ff;
+}
+
+.avatar-label input[type="file"] {
+    display: none;
+}
+
+.avatar-label {
+    margin-top: 10px;
+    color: #0a84ff;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: inline-block;
+    padding: 5px 10px;
+}
+
+.avatar-label:hover {
+    text-decoration: underline;
+}
+
+.email-readonly-group {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+/* Tùy chỉnh giao diện cho input chỉ đọc */
+.input-readonly {
+    background-color: #f8f9fa !important; /* Màu nền xám nhẹ */
+    color: #6c757d !important;           /* Màu chữ mờ đi */
+    cursor: not-allowed;                  /* Biểu tượng chuột cấm chỉnh sửa */
+    border: 1px solid #e9ecef !important;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.form-group > div, 
+.form-group input {
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+.form-group label, .address-section label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #444;
+}
+
+.address-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Khoảng cách giữa các hàng select và input */
+    border-top: 1px solid #eee;
+    padding-top: 1.5rem;
+    margin-top: 1rem;
+}
+.address-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #444;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.save-btn {
+    width: 100%;
+    margin-top: 1rem;
+    height: 50px;
+    font-size: 1rem;
+}
+
+@media (max-width: 480px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}

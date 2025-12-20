@@ -1,0 +1,116 @@
+.news-container {
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+.news-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.news-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.news-search {
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  min-width: 150px;
+}
+
+/* ===== Table ===== */
+.news-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* Bắt buộc để chia cột theo % chính xác */
+}
+
+.news-table th,
+.news-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+  /* Quan trọng: Ẩn nội dung tràn để không bị lấn sang ô khác */
+  overflow: hidden; 
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle; /* Căn giữa theo chiều dọc */
+}
+
+.news-table th {
+  background: #007bff;
+  color: white;
+}
+
+.news-table tr:nth-child(even) {
+  background: #f2f2f2;
+}
+
+.news-table tr:hover {
+  background: #ddd;
+}
+
+/* 🚀 Tỷ lệ 12 phần: 3-4-1-1-1-1-1 */
+.news-table th.col-title,
+.news-table td.col-title { width: 25%; text-align: left; }      /* 3/12 */
+
+.news-table th.col-content,
+.news-table td.col-content { width: 33.3333%; text-align: left; } /* 4/12 */
+
+.news-table th.col-date,
+.news-table td.col-date { width: 8.3333%; }                     /* 1/12 */
+
+.news-table th.col-likes,
+.news-table td.col-likes { width: 8.3333%; }                    /* 1/12 */
+
+.news-table th.col-comments,
+.news-table td.col-comments { width: 8.3333%; }                 /* 1/12 */
+
+.news-table th.col-views,
+.news-table td.col-views { width: 8.3333%; }                    /* 1/12 */
+
+.news-table th.col-action,
+.news-table td.col-action { 
+  width: 8.3333%;                                               /* 1/12 */
+  padding: 4px 2px; /* Padding nhỏ để tối ưu không gian */
+} 
+
+/* Action Buttons Container */
+/* Sử dụng div bao ngoài trong React để dễ style hơn là style trực tiếp lên TD */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px; /* Khoảng cách giữa 2 nút */
+  width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .news-table th, .news-table td {
+    font-size: 12px;
+    padding: 6px;
+  }
+  
+  /* Trên mobile có thể cần ẩn bớt cột hoặc cho phép cuộn ngang */
+  .news-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .news-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .news-header-actions {
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+}

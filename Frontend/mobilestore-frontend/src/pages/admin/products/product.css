@@ -1,0 +1,138 @@
+.product-container {
+  padding: 20px;
+}
+
+.product-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.action-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.search-box,
+.category-filter {
+  padding: 7px 10px;
+  border-radius: 6px;
+  border: 1px solid #bfc5c9;
+  background: #fff;
+}
+
+.product-table {
+  margin-top: 25px;
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+
+  table-layout: fixed;   /* ⭐ QUAN TRỌNG: khóa layout */
+}
+
+.product-table th {
+  background: #f0f3f5;
+  padding: 12px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.product-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.product-img {
+  width: 65px;
+  height: 65px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.status-active {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.status-inactive {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+
+.form-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group input,
+.form-group select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.product-name {
+  max-width: 260px;          /* giới hạn chiều ngang */
+  white-space: normal;       /* cho phép xuống dòng */
+  word-break: break-word;    /* cắt từ dài */
+  line-height: 1.4;
+}
+
+.product-sku {
+  font-size: 16px;        /* to hơn */
+  color: #6c757d;         /* xám nhạt */
+  margin-top: 6px;
+}
+
+/* Name */
+.product-table th:nth-child(1),
+.product-table td:nth-child(1) {
+  width: 260px;
+}
+
+/* Image */
+.product-table th:nth-child(2),
+.product-table td:nth-child(2) {
+  width: 90px;
+}
+
+/* Price */
+.product-table th:nth-child(3),
+.product-table td:nth-child(3) {
+  width: 130px;
+}
+
+/* Stock */
+.product-table th:nth-child(4),
+.product-table td:nth-child(4) {
+  width: 90px;
+}
+
+/* Sold */
+.product-table th:nth-child(5),
+.product-table td:nth-child(5) {
+  width: 90px;
+}
+
+/* Status */
+.product-table th:nth-child(6),
+.product-table td:nth-child(6) {
+  width: 100px;
+}
+
+/* Actions */
+.product-table th:nth-child(7),
+.product-table td:nth-child(7) {
+  width: 180px;
+}

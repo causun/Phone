@@ -1,0 +1,19 @@
+# ===== DOC =====
+doc/
+
+# ===== BACKEND (Spring Boot) =====
+**/application.properties
+**/application-local.properties
+.env
+target/
+
+# ===== NODE / FRONTEND =====
+**/node_modules/
+
+# ===== FLUTTER =====
+**/.metadata
+**/build/
+
+# ===== OS =====
+.DS_Store
+Thumbs.db

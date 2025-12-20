@@ -1,0 +1,213 @@
+.orders-container {
+  background-color: #f0f2f5;
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+
+.orders-wrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 30px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.page-header p {
+  color: #64748b;
+  margin-top: 5px;
+}
+
+/* Group đơn hàng */
+.order-group {
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.order-group.active {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  border-color: #3b82f6;
+}
+
+/* Card chính khi chưa mở rộng */
+.order-main-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  cursor: pointer;
+}
+
+.card-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.order-code {
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 16px;
+}
+
+.order-time {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.card-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.order-price-summary .label {
+  font-size: 13px;
+  color: #64748b;
+  margin-right: 8px;
+}
+
+.order-price-summary .value {
+  font-weight: 700;
+  color: #ef4444;
+  font-size: 18px;
+}
+
+/* Status Tags */
+.status-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-tag.pending { background: #fef3c7; color: #d97706; }
+.status-tag.approved { background: #dcfce7; color: #166534; }
+.status-tag.cancelled { background: #fee2e2; color: #991b1b; }
+
+/* Phần chi tiết khi mở rộng */
+.order-expanded-details {
+  border-top: 1px dashed #e2e8f0;
+  padding: 24px;
+  background-color: #f8fafc;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 30px;
+}
+
+.details-section h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 15px 0;
+  font-size: 15px;
+  color: #334155;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 8px;
+}
+
+.info-box {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  line-height: 1.6;
+}
+
+.info-box p { margin: 0; font-size: 14px; }
+.address { color: #475569; margin-top: 5px !important; }
+.note { margin-top: 10px !important; padding-top: 10px; border-top: 1px solid #f1f5f9; font-style: italic; color: #64748b; }
+.note span { font-weight: 600; color: #334155; }
+
+/* List sản phẩm */
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #f1f5f9;
+}
+
+.item-row img {
+  width: 50px; height: 50px;
+  border-radius: 6px; object-fit: cover;
+}
+
+.item-info { flex: 1; }
+.item-info .name { font-weight: 600; font-size: 14px; margin: 0; }
+.item-info .qty-price { font-size: 12px; color: #64748b; margin-top: 2px; }
+.item-total { font-weight: 600; color: #1e293b; font-size: 14px; }
+
+/* Tổng kết thanh toán */
+.payment-final {
+  margin-top: 20px;
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.final-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.final-row.total {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.big-price {
+  color: #ef4444;
+  font-size: 20px;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 80px 0;
+  color: #94a3b8;
+}
+
+.empty-state button {
+  margin-top: 20px;
+  padding: 10px 25px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .details-grid { grid-template-columns: 1fr; }
+  .card-right { gap: 10px; }
+  .order-price-summary .value { font-size: 15px; }
+}
