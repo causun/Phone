@@ -52,9 +52,8 @@ export default function MyOrdersPage() {
           myReviews = Array.isArray(reviewsRes.data)
             ? reviewsRes.data
             : reviewsRes.data?.data || [];
-
-        } catch (err) {
-          console.warn("Không lấy được reviews / đặt về []");
+        } catch {
+          console.warn("Không lấy được reviews → []");
         }
 
         setUser(userRes.data.data);
@@ -70,18 +69,18 @@ export default function MyOrdersPage() {
           items: order.items?.map((item) => ({
             ...item,
             reviewed: myReviews.some(
-              (r) => r.orderId === order.id && r.productId === item.productId
+              (r) =>
+                r.orderId === order.id &&
+                r.productId === item.productId
             ),
           })),
         }));
 
         setOrders(merged);
-
       } catch (e) {
         console.error("Lỗi load MyOrdersPage:", e?.response || e);
 
         const status = e?.response?.status;
-
         if (status === 401 || status === 403) {
           localStorage.removeItem("trip-token");
           navigate("/login");
@@ -106,7 +105,9 @@ export default function MyOrdersPage() {
           ? {
               ...o,
               items: o.items.map((i) =>
-                i.productId === productId ? { ...i, reviewed: true } : i
+                i.productId === productId
+                  ? { ...i, reviewed: true }
+                  : i
               ),
             }
           : o
@@ -123,6 +124,7 @@ export default function MyOrdersPage() {
 
         {orders.map((order) => (
           <div className="order-card" key={order.id}>
+            {/* ===== HEADER ===== */}
             <div className="order-header">
               <span>Mã đơn #{order.id}</span>
               <span className={`order-status status-${order.status}`}>
@@ -130,6 +132,7 @@ export default function MyOrdersPage() {
               </span>
             </div>
 
+            {/* ===== PRODUCTS ===== */}
             <div className="order-products">
               {order.items?.map((item) => (
                 <div className="order-product" key={item.productId}>
@@ -157,6 +160,16 @@ export default function MyOrdersPage() {
                 </div>
               ))}
             </div>
+
+            {/* ===== ACTION ===== */}
+            <div className="order-actions">
+              <button
+                className="btn-detail"
+                onClick={() => navigate(`/order/${order.id}`)}
+              >
+                Xem chi tiết đơn hàng →
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -173,6 +186,7 @@ export default function MyOrdersPage() {
   );
 }
 
+/* ================= STATUS ================= */
 function translateStatus(status) {
   switch (status) {
     case "PENDING":
