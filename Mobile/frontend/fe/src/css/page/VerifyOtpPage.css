@@ -1,0 +1,119 @@
+:root {
+  --primary: #2563eb;
+  --primary-light: #3b82f6;
+  --primary-soft: #eff6ff;
+
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+
+  --border: #e5e7eb;
+  --bg: #ffffff;
+
+  --radius: 18px;
+  --shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+}
+
+/* ================= PAGE ================= */
+.verify-page {
+  min-height: calc(100vh - 68px);
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+/* ================= CARD ================= */
+.verify-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: var(--radius);
+  padding: 42px 38px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+/* ================= TITLE ================= */
+.verify-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 6px;
+}
+
+.verify-subtitle {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 15px;
+  margin-bottom: 32px;
+}
+
+/* ================= FORM ================= */
+.verify-group {
+  margin-bottom: 20px;
+}
+
+.verify-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text-main);
+}
+
+.verify-group input {
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 15px;
+  color: var(--text-main);
+  transition: 0.25s;
+}
+
+.verify-group input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+/* ================= BUTTON ================= */
+.verify-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 999px;
+  border: none;
+  background: var(--primary);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.25s;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.verify-btn:hover {
+  background: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+.verify-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 480px) {
+  .verify-card {
+    padding: 34px 24px;
+  }
+
+  .verify-title {
+    font-size: 24px;
+  }
+}
