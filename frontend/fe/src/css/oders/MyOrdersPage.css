@@ -1,0 +1,175 @@
+/* ================= DESIGN SYSTEM ================= */
+:root {
+  --primary: #2563eb;
+  --primary-soft: #eef2ff;
+
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --info: #0ea5e9;
+  --danger: #ef4444;
+
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+
+  --border: #e5e7eb;
+  --bg-page: #f8fafc;
+  --bg-card: #ffffff;
+
+  --radius-lg: 18px;
+  --radius-md: 12px;
+
+  --shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+/* ================= PAGE ================= */
+.order-container {
+  max-width: 920px;
+  margin: 32px auto 60px;
+  padding: 0 20px;
+  background: var(--bg-page);
+}
+
+.order-container h2 {
+  font-size: 26px;
+  font-weight: 800;
+  margin: 24px 0;
+  color: var(--text-main);
+}
+
+/* ================= CARD ================= */
+.order-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  margin-bottom: 22px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+}
+
+/* ================= HEADER ================= */
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.order-header span:first-child {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+/* ================= STATUS ================= */
+.order-status {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+/* status color */
+.status-PENDING {
+  background: #fff7ed;
+  color: var(--warning);
+}
+
+.status-CONFIRMED {
+  background: #eff6ff;
+  color: var(--primary);
+}
+
+.status-SHIPPING {
+  background: #ecfeff;
+  color: var(--info);
+}
+
+.status-COMPLETED {
+  background: #ecfdf5;
+  color: var(--success);
+}
+
+.status-CANCELLED {
+  background: #fef2f2;
+  color: var(--danger);
+}
+
+/* ================= PRODUCTS ================= */
+.order-products {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ================= ITEM ================= */
+.order-product {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* image */
+.order-product img {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  border: 1px solid var(--border);
+  background: #ffffff;
+}
+
+/* info */
+.order-product > div {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+/* name */
+.order-product .name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+/* ================= REVIEW BUTTON ================= */
+.order-product button {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  background: var(--primary);
+  color: #ffffff;
+  transition: 0.2s;
+}
+
+.order-product button:hover {
+  opacity: 0.9;
+}
+
+.order-product button:disabled {
+  background: #e5e7eb;
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 600px) {
+  .order-product {
+    align-items: flex-start;
+  }
+
+  .order-product > div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
